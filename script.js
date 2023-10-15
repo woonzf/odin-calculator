@@ -12,4 +12,35 @@ document.addEventListener("DOMContentLoaded", () => {
         createButton.textContent = button;
         areaButtons.appendChild(createButton);
     }
+
+    const buttons = areaButtons.querySelectorAll("button");
+    const inputField = document.querySelector(".input");
+    let text = "";
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            const input = button.textContent;
+
+            if (!isNaN(+input)) {
+                text += input;
+            }
+            else if (input === "C") {
+                text = "";
+            }
+            else if (input === "<-") {
+                const arr = text.split(" ");
+                const arrLen = arr.length;
+                const arrNew = arr.slice(0, arrLen - 1);
+
+                const last = arr[arrLen - 1];
+                const lastNew = last.slice(0, last.length - 1);
+
+                text = arrNew.join(" ") + " " + lastNew;
+            } else {
+                text += " " + input + " ";
+            }
+
+            inputField.textContent = text;
+        });
+    });
 });
