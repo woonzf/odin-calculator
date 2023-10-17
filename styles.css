@@ -28,11 +28,6 @@
     flex-direction: column;
 }
 
-.warning {
-    color: red;
-    min-height: 18px;
-}
-
 .input {
     font-size: 20px;
     min-height: 23px;
@@ -55,4 +50,8 @@ button {
     height: 83.75px;
     border-radius: 5px;
     font-size: 20px;
+}
+
+button:hover {
+    background-color: lightgrey;
 }

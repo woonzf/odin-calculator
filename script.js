@@ -17,59 +17,75 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const buttons = areaButtons.querySelectorAll("button");
-    const warningField = document.querySelector(".warning");
     const inputField = document.querySelector(".input");
     const resultField = document.querySelector(".result");
     
-    let error = 0;
     let text = "";
-    let result = 0;
+    let result = "";
 
     buttons.forEach(button => {
         button.addEventListener("click", () => {
             const input = button.textContent;
-            const temp = text;
+            const temp = result;
 
-            // If input is not action
-            if (!boolAction(input)) {
+            // If input is not action and operator
+            if (!isAction(input) && !isOperator(input)) {
                 // Insert character
-                text = insertChar(input, text);
-                error = 0;
+                result = insertChar(input, result);
                 
-                // Error if max string length
-                if (text.length > 16) {
-                    text = temp;
-                    result = "Error";
-                    error = 1;
+                // Ignore input if max length
+                if (result.length > 16) {
+                    result = temp;
                 }
-            } else {
+            }
+
+            // If input is operator
+            if (isOperator(input)) {
+                // Replace operator if last input is operator
+                if (isOperator(text.charAt(text.length - 1))) {
+                    if (result !== "") {
+                        text = round(operate(text + " " + result)) + " " + input;
+                    } else {
+                        text = text.split(" ")[0] + " " + input;
+                    }
+                } else {
+                    text = result + " " + input;
+                }
+
+                result = "";
+            }
+            
+            // If input is action
+            if (isAction(input)) {
                 switch(input) {
                     // Clear input and result field
                     case "C":
                         text = "";
-                        result = 0;
-                        error = 0;
+                        result = "0";
+                        break;
+                    // Convert percentage
+                    case "%":
+                        result = text.split(" ")[0] / 100;
                         break;
                     // Delete last character
                     case "<-":
-                        text = deleteLastChar(text);
-                        error = 0;
+                        result = result.slice(0, result.length - 1);
                         break;
                     // Calculate
                     case "=":
-                        result = operate(text);
-                        error = 0;
-
-                        if (isNaN(result)) {
-                            result = "Error";
-                            error = 2;
+                        if (text !== "") {
+                            if (isOperator(text.charAt(text.length - 1))) {
+                                text = text + " " + result;
+                            }
+                        } else {
+                            text = result;
                         }
 
+                        result = round(operate(text));
                         break;
                 }
             }
 
-            warningField.textContent = getWarning(error);
             inputField.textContent = text;
             resultField.textContent = result;
         });
@@ -77,9 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Functions
-const boolAction = str => {
+const isAction = str => {
     switch(str) {
         case "C":
+        case "%":
         case "<-":
         case "=":
             return true;
@@ -88,7 +105,7 @@ const boolAction = str => {
     }
 }
 
-const boolOperator = str => {
+const isOperator = str => {
     switch(str) {
         case "%":
         case "÷":
@@ -101,49 +118,31 @@ const boolOperator = str => {
     }
 }
 
-const insertChar = (input, text) => {
-    // If input is number or dot
-    if (!isNaN(+input) || input === ".") {
-        const arr = text.split(" ");
-        const len = arr.length;
+const insertChar = (input, str) => {
+    // If str starts with 0
+    if (+str === 0) {
+        // Return 0. if first input is .
+        if (input === ".") {
+            return 0 + input;
+        }
 
-        // If previous char is operator
-        if (boolOperator(arr[len - 1])) {
-            return text + " " + input;
-        } else {
-            return text + input;
+        // Allow decimal
+        if (str.startsWith("0.")) {
+            return str + input;
+        }
+        
+        // Prevent integer starts with 0
+        return str.slice(1, str.length - 1) + input;
+    }
+
+    // Ignore . if str is decimal
+    if (input === ".") {
+        if (+str % 1 !== 0 || str.endsWith(".")) {
+            return str;
         }
     }
-    // If input is operator
-    else if (boolOperator(input)) {
-        return text + " " + input;
-    }
-}
 
-const deleteLastChar = str => {
-    const arr = str.split(" ");
-    const lenArr = arr.length;
-    const arrNew = arr.slice(0, lenArr - 1);
-
-    const last = arr[lenArr - 1];
-    const lastNew = last.slice(0, last.length - 1);
-
-    if (lastNew.length === 0) {
-        return arrNew.join(" ");
-    } else {
-        return arrNew.join(" ") + " " + lastNew;
-    }
-}
-
-const getWarning = code => {
-    switch(code) {
-        case 0:
-            return "";
-        case 1:
-            return "Max string length reached!";
-        case 2:
-            return "Expression error!";
-    }
+    return str + input;
 }
 
 const operate = str => {
@@ -158,28 +157,31 @@ const operate = str => {
 
     switch(arr[1]) {
         case "+":
-            return add(a, b);
+            return a + b;
         case "-":
-            return subtract(a, b);
+            return a - b;
         case "x":
-            return multiply(a, b);
+            return a * b;
         case "÷":
-            return divide(a, b);
+            return a / b;
     }
 }
 
-const add = (a, b) => {
-    return a + b;
-}
+const round = str => {
+    // Convert to string if variable is number
+    if (typeof str === "number") {
+        str = String(str);
+    }
 
-const subtract = (a, b) => {
-    return a - b;
-}
+    // If decimal
+    if (str % 1 !== 0) {
+        const decimal = str.split(".")[1];
 
-const multiply = (a, b) => {
-    return a * b;
-}
+        // Round to 3 decimal if decimal more than 3
+        if (decimal.length > 3) {
+            return parseFloat(str).toFixed(3);
+        }
+    }
 
-const divide = (a, b) => {
-    return a / b;
+    return str;
 }
