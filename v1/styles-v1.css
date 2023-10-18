@@ -18,7 +18,7 @@
 }
 
 .display {
-    background-color: rgb(200, 200, 200);
+    background-color: rgb(196, 196, 196);
     text-align: end;
     border-radius: 10px;
     box-sizing: border-box;
@@ -28,45 +28,38 @@
     flex-direction: column;
 }
 
-#display1 {
+.input {
     font-size: 20px;
-    min-height: 30px;
+    min-height: 23px;
 }
 
-#display2 {
+.result {
     font-size: 40px;
-    min-height: 50px;
+    min-height: 47px;
 }
 
 .button {
     display: flex;
-    text-align: center;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
-.left {
-    flex: 3;
+.clear {
+    background-color: orange;
 }
 
-.right {
-    flex: 1;
+.clear:hover {
+    background-color: darkorange;
 }
 
 button {
-    width: 80px;
-    height: 80px;
+    /* width = (350 - (5 * 3)) / 4 */
+    width: 83.75px;
+    height: 83.75px;
     border-radius: 5px;
     font-size: 20px;
-    margin: 2px 0;
 }
 
 button:hover {
     background-color: lightgrey;
-}
-
-#clear {
-    background-color: orange;
-}
-
-#clear:hover {
-    background-color: rgb(235, 145, 0);
 }

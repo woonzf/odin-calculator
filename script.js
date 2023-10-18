@@ -1,103 +1,35 @@
-// Buttons to be generated
-const buttonList = ["C", "%", "<-", "÷",
-                    "7", "8", "9", "x",
-                    "4", "5", "6", "-",
-                    "1", "2", "3", "+",
-                    "00", "0", ".", "="];
-
 // Run after DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    const areaButtons = document.querySelector(".button");
+    const buttons = document.querySelector(".button");
+    const display1 = document.querySelector("#display1");
+    const display2 = document.querySelector("#display2");
 
-    // Generate buttons
-    for (const button of buttonList) {
-        const createButton = document.createElement("button");
-        createButton.textContent = button;
-        areaButtons.appendChild(createButton);
-    }
+    buttons.addEventListener("click", (e) => {
+        const input = e.target.textContent;
 
-    const buttons = areaButtons.querySelectorAll("button");
-    const inputField = document.querySelector(".input");
-    const resultField = document.querySelector(".result");
-    
-    let text = "";
-    let result = "";
+        if (isNumber(input)) insertChar(input)
+        if (input === "C") clear()
+        if (input === "<-") deleteChar()
+        if (isOperator(input)) operate(input)
+    })
 
-    buttons.forEach(button => {
-        button.addEventListener("click", () => {
-            const input = button.textContent;
-            const temp = result;
-
-            // If input is not action and operator
-            if (!isAction(input) && !isOperator(input)) {
-                // Insert character
-                result = insertChar(input, result);
-                
-                // Ignore input if max length
-                if (result.length > 16) {
-                    result = temp;
-                }
-            }
-
-            // If input is operator
-            if (isOperator(input)) {
-                // Replace operator if last input is operator
-                if (isOperator(text.charAt(text.length - 1))) {
-                    if (result !== "") {
-                        text = round(operate(text + " " + result)) + " " + input;
-                    } else {
-                        text = text.split(" ")[0] + " " + input;
-                    }
-                } else {
-                    text = result + " " + input;
-                }
-
-                result = "";
-            }
-            
-            // If input is action
-            if (isAction(input)) {
-                switch(input) {
-                    // Clear input and result field
-                    case "C":
-                        text = "";
-                        result = "0";
-                        break;
-                    // Convert percentage
-                    case "%":
-                        result = text.split(" ")[0] / 100;
-                        break;
-                    // Delete last character
-                    case "<-":
-                        result = result.slice(0, result.length - 1);
-                        break;
-                    // Calculate
-                    case "=":
-                        if (text !== "") {
-                            if (isOperator(text.charAt(text.length - 1))) {
-                                text = text + " " + result;
-                            }
-                        } else {
-                            text = result;
-                        }
-
-                        result = round(operate(text));
-                        break;
-                }
-            }
-
-            inputField.textContent = text;
-            resultField.textContent = result;
-        });
-    });
-});
+    // Keyboard support
+    document.addEventListener("keypress", (e) => {
+        console.log(e.key)
+    })
+})
 
 // Functions
-const isAction = str => {
-    switch(str) {
-        case "C":
-        case "%":
-        case "<-":
+const isNumber = input => {
+    return !isNaN(input) || input === "." ? true : false
+}
+
+const isOperator = (input) => {
+    switch(input) {
+        case "÷":
+        case "x":
+        case "-":
+        case "+":
         case "=":
             return true;
         default:
@@ -105,83 +37,80 @@ const isAction = str => {
     }
 }
 
-const isOperator = str => {
-    switch(str) {
-        case "%":
-        case "÷":
-        case "x":
-        case "-":
-        case "+":
-            return true;
-        default:
-            return false;
+const insertChar = input => {
+    const text = display2.textContent;
+
+    // Max display length is 15
+    if (text.length > 14) {
+        if (input === "00") return
+        else if (text.length > 15) return
     }
+
+    // Prevent more than 1 dot
+    if (text.includes(".") && input === ".") return
+
+    if (text === "0" || text === "00") {
+        if (input === ".") display2.textContent = "0.";
+        else display2.textContent = input;
+        return
+    }
+
+    display2.textContent += input;
 }
 
-const insertChar = (input, str) => {
-    // If str starts with 0
-    if (+str === 0) {
-        // Return 0. if first input is .
-        if (input === ".") {
-            return 0 + input;
-        }
-
-        // Allow decimal
-        if (str.startsWith("0.")) {
-            return str + input;
-        }
-        
-        // Prevent integer starts with 0
-        return str.slice(1, str.length - 1) + input;
-    }
-
-    // Ignore . if str is decimal
-    if (input === ".") {
-        if (+str % 1 !== 0 || str.endsWith(".")) {
-            return str;
-        }
-    }
-
-    return str + input;
+const clear = () => {
+    display1.textContent = "";
+    display2.textContent = 0;
 }
 
-const operate = str => {
-    const arr = str.split(" ");
+const deleteChar = () => {
+    display2.textContent = display2.textContent.slice(0, -1);
+}
 
-    if (arr.length === 1) {
-        return str;
+const operate = input => {
+    if (display1.textContent === "") {
+        display1.textContent = display2.textContent + " " + input;
+        display2.textContent = "";
+        return
     }
 
+    const d1Len = display1.textContent.split(" ").length;
+
+    if (d1Len > 2) {
+        display1.textContent = display2.textContent + " " + input;
+        display2.textContent = "";
+    }
+
+    const arr = display1.textContent.split(" ");
     const a = +arr[0];
-    const b = +arr[2];
+    const b = +display2.textContent;
+    const operator = arr[1];
 
-    switch(arr[1]) {
-        case "+":
-            return a + b;
-        case "-":
-            return a - b;
-        case "x":
-            return a * b;
+    console.log(a, b, operator)
+
+    let result = "";
+
+    switch(operator) {
         case "÷":
-            return a / b;
-    }
-}
-
-const round = str => {
-    // Convert to string if variable is number
-    if (typeof str === "number") {
-        str = String(str);
-    }
-
-    // If decimal
-    if (str % 1 !== 0) {
-        const decimal = str.split(".")[1];
-
-        // Round to 3 decimal if decimal more than 3
-        if (decimal.length > 3) {
-            return parseFloat(str).toFixed(3);
-        }
+            result = a / b;
+            break;
+        case "x":
+            result = a * b;
+            break;
+        case "-":
+            result = a - b;
+            break;
+        case "+":
+            result = a + b;
+            break;
     }
 
-    return str;
+    if (input === "=") {
+        display1.textContent += " " + b;
+        display2.textContent = result;
+        return
+    }
+
+    display1.textContent = result + " " + input;
+    display2.textContent = "";
 }
