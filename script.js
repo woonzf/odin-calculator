@@ -1,3 +1,12 @@
+// Global variables
+let text1 = "";
+let text2 = "";
+let input = "";
+let isInitial = true;
+let a = null;
+let b = null;
+let operator = null;
+
 // Run after DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
     const buttons = document.querySelector(".button");
@@ -5,12 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const display2 = document.querySelector("#display2");
 
     buttons.addEventListener("click", (e) => {
-        const input = e.target.textContent;
+        text1 = display1.textContent;
+        text2 = display2.textContent;
+        input = e.target.textContent;
 
-        if (isNumber(input)) insertChar(input)
-        if (input === "C") clear()
-        if (input === "<-") deleteChar()
-        if (isOperator(input)) operate(input)
+        if (isNumber(input)) insertChar(input);
+        if (input === "C") clear();
+        if (input === "<-") deleteChar();
+        if (isOperator(input)) operate(input);
     })
 
     // Keyboard support
@@ -21,11 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Functions
 const isNumber = input => {
-    return !isNaN(input) || input === "." ? true : false
+    return !isNaN(input) || input === "." ? true : false;
 }
 
 const isOperator = (input) => {
     switch(input) {
+        case "%":
         case "÷":
         case "x":
         case "-":
@@ -38,79 +50,129 @@ const isOperator = (input) => {
 }
 
 const insertChar = input => {
-    const text = display2.textContent;
-
     // Max display length is 15
-    if (text.length > 14) {
-        if (input === "00") return
-        else if (text.length > 15) return
+    if (text2.length > 14) {
+        if (input === "00") return;
+        else if (text2.length > 15) return;
     }
 
     // Prevent more than 1 dot
-    if (text.includes(".") && input === ".") return
+    if (text2.includes(".") && input === ".") return;
 
-    if (text === "0" || text === "00") {
+    // Auto convert to 0. if display2 is 0 or empty
+    if (text2 === "0" || text2 === "00" || text2 === "") {
         if (input === ".") display2.textContent = "0.";
         else display2.textContent = input;
-        return
+        return;
     }
 
     display2.textContent += input;
 }
 
 const clear = () => {
-    display1.textContent = "";
-    display2.textContent = 0;
+    updateDisplay("", 0);
+    a = b = operator = null;
+    isInitial = true;
 }
 
 const deleteChar = () => {
-    display2.textContent = display2.textContent.slice(0, -1);
+    display2.textContent = text2.slice(0, -1);
 }
 
 const operate = input => {
-    if (display1.textContent === "") {
-        display1.textContent = display2.textContent + " " + input;
-        display2.textContent = "";
-        return
-    }
-
-    const d1Len = display1.textContent.split(" ").length;
-
-    if (d1Len > 2) {
-        display1.textContent = display2.textContent + " " + input;
-        display2.textContent = "";
-    }
-
-    const arr = display1.textContent.split(" ");
-    const a = +arr[0];
-    const b = +display2.textContent;
-    const operator = arr[1];
-
-    console.log(a, b, operator)
-
-    let result = "";
-
-    switch(operator) {
-        case "÷":
-            result = a / b;
-            break;
-        case "x":
-            result = a * b;
-            break;
-        case "-":
-            result = a - b;
-            break;
-        case "+":
-            result = a + b;
-            break;
+    // Initial setup
+    if (isInitial) {
+        a = +text2;
+        operator = input;
+        updateDisplay(`${a} ${operator}`, "");
+        isInitial = false;
+        return;
     }
 
     if (input === "=") {
-        display1.textContent += " " + b;
-        display2.textContent = result;
-        return
+        operateEqual();
+        return;
     }
 
-    display1.textContent = result + " " + input;
-    display2.textContent = "";
+    if (input === "%") {
+        operatePercent();
+        return;
+    }
+
+    operateElse();
+}
+
+const operateEqual = () => {
+    // If last operation is =
+    if (text1.split(" ").length === 3) {
+
+        // Update a and display if text2 changes
+        if (+text2 !== a && text2 !== "") {
+            a = +text2;
+            display1.textContent = "";
+        }
+        
+        // Ignore
+        return;
+    }
+
+    // Result is a if b is missing
+    if (text1 === "" || text2 === "") {
+        updateDisplay("", a);
+        return;
+    }
+
+    b = +text2;
+    console.log(a, operator, b)
+
+    const temp = `${a} ${operator} ${b}`;
+    a = calculate();
+    updateDisplay(temp, a);
+}
+
+const operatePercent = () => {
+
+}
+
+const operateElse = () => {
+    if (text1.split(" ").length < 3 && text1 !== "") {
+        b = +text2;
+    }
+
+    if (text2 !== "") {
+        a = calculate();
+    }
+
+    operator = input;
+    updateDisplay(`${a} ${operator}`, "");
+}
+
+const calculate = () => {
+    let result = 0;
+
+    switch(operator) {
+        case "÷":
+            result =  a / b;
+            break;
+        case "x":
+            result =  a * b;
+            break;
+        case "-":
+            result =  a - b;
+            break;
+        case "+":
+            result =  a + b;
+            break;
+    }
+
+    return result;
+}
+
+const round = number => {
+    
+}
+
+const updateDisplay = (str1, str2) => {
+    display1.textContent = str1;
+    display2.textContent = str2;
 }
