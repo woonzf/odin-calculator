@@ -1,3 +1,50 @@
+body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header, footer {
+    background-color: black;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    gap: 10px;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.content {
+    display: flex;
+    gap: 30px;
+}
+
+.note {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.note-top {
+    text-align: center;
+}
+
+.note-bottom {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.key {
+    text-align: right;
+}
+
 .calculator {
     background-color: #6a689e;
     height: 700px;
@@ -9,6 +56,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-left: 180px;
 }
 
 .brand {
@@ -69,4 +117,13 @@ button:hover {
 
 #clear:hover {
     background-color: rgb(235, 145, 0);
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+img {
+    height: 30px;
 }
