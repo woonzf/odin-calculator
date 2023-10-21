@@ -13,39 +13,68 @@ document.addEventListener("DOMContentLoaded", () => {
     const display2 = document.querySelector("#display2");
 
     buttons.addEventListener("click", (e) => {
-        text1 = display1.textContent;
-        text2 = display2.textContent;
-        const input = e.target.textContent;
-
-        if (isNumber(input)) {
-            insertChar(input);
-            return;
-        }
-
-        if (input === "C") {
-            clear();
-            return;
-        }
-
-        if (input === "<-") {
-            deleteChar();
-            return;
-        }
-
-        if (isOperator(input)) {
-            operate(input);
-            return;
-        }
+        runCalculator(e.target.textContent);
     })
 
     // Keyboard support
-    document.addEventListener("keypress", (e) => {
-        console.log(e.key)
+    document.addEventListener("keydown", (e) => {
+        let input = e.key;
+
+        switch(input) {
+            case "Delete":
+                input = "C";
+                break;
+            case "p":
+                input = "%";
+                break;
+            case "Backspace":
+                input = "<-";
+                break;
+            case "/":
+                input = "÷";
+                break;
+            case "*":
+                input = "x";
+                break;
+            case "Enter":
+                // Prevent entering last mouse click
+                e.preventDefault();
+                input = "=";
+                break;
+        }
+
+        runCalculator(input);
     })
 })
 
 // Functions
+const runCalculator = input => {
+    text1 = display1.textContent;
+    text2 = display2.textContent;
+
+    if (isNumber(input)) {
+        insertChar(input);
+        return;
+    }
+
+    if (input === "C") {
+        clear();
+        return;
+    }
+
+    if (input === "<-") {
+        deleteChar();
+        return;
+    }
+
+    if (isOperator(input)) {
+        operate(input);
+        return;
+    }
+}
+
 const isNumber = input => {
+    // Accept number and dot
     return !isNaN(input) || input === "." ? true : false;
 }
 
@@ -128,17 +157,17 @@ const operate = input => {
         return;
     }
 
-    if (input === "=") {
-        operateEqual();
-        return;
+    switch(input) {
+        case "=":
+            operateEqual();
+            break;
+        case "%":
+            operatePercent();
+            break;
+        default:
+            operateElse(input);
+            break;
     }
-
-    if (input === "%") {
-        operatePercent();
-        return;
-    }
-
-    operateElse(input);
 }
 
 const operateEqual = () => {
