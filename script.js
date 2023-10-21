@@ -169,6 +169,11 @@ const operateEqual = () => {
 }
 
 const operatePercent = () => {
+    // Update a if text2 is modified
+    if (+text2 !== a && text2 !== "" && text1.split(" ").length !== 2) {
+        a = +text2;
+    }
+
     // Convert text2 if no a
     if (text1 === "" && text2 !== "") {
         // Only accept up to 0.001
@@ -236,6 +241,7 @@ const calculate = () => {
 }
 
 const round = number => {
+    // Round to 3 decimal if decimal more than 3
     if (number % 1 !== 0) {
         const decimal = String(number).split(".")[1].length;
         if (decimal > 3) return +(number.toFixed(3));
