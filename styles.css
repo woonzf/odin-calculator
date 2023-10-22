@@ -88,7 +88,6 @@ header, footer {
 
 .button {
     display: flex;
-    text-align: center;
 }
 
 .left {
@@ -97,6 +96,17 @@ header, footer {
 
 .right {
     flex: 1;
+}
+
+.action {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.number {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
 }
 
 button {
