@@ -93,6 +93,9 @@ const isOperator = input => {
 }
 
 const insertChar = input => {
+    // Ignore if text2 is infinity
+    if (!isFinite(+text2)) return;
+
     // If max display length
     const len = text2.length;
     if (len >= MAX_LENGTH - 1) {
@@ -118,6 +121,9 @@ const clear = () => {
 }
 
 const deleteChar = () => {
+    // Ignore if text2 is infinity
+    if (!isFinite(+text2)) return;
+
     display2.textContent = text2.slice(0, -1);
 }
 
