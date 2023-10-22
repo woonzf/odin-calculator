@@ -94,7 +94,7 @@ const isOperator = input => {
 
 const insertChar = input => {
     // Ignore if text2 is infinity
-    if (!isFinite(+text2)) return;
+    if (text2 === "Infinity") return;
 
     // If max display length
     const len = text2.length;
@@ -122,7 +122,7 @@ const clear = () => {
 
 const deleteChar = () => {
     // Ignore if text2 is infinity
-    if (!isFinite(+text2)) return;
+    if (text2 === "Infinity") return;
 
     display2.textContent = text2.slice(0, -1);
 }
@@ -177,9 +177,7 @@ const operate = input => {
 }
 
 const operateEqual = () => {
-    if (text1 === "") return;
-
-    // If last operation is =
+    // If last operation is = or text1 is empty
     if (text1.split(" ").length === 3 || text1 === "") {
         // Update a and display if text2 changes
         if (+text2 !== a && text2 !== "") {
@@ -204,6 +202,9 @@ const operateEqual = () => {
 }
 
 const operatePercent = () => {
+    // Ignore if text2 is infinity
+    if (!isFinite(+text2) || !isFinite(a)) return;
+
     // Update a if text2 is modified
     if (+text2 !== a && text2 !== "" && text1.split(" ").length !== 2) {
         a = +text2;
