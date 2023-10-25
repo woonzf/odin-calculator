@@ -80,12 +80,12 @@ header, footer {
 
 #display1 {
     font-size: 20px;
-    min-height: 30px;
+    height: 30px;
 }
 
 #display2 {
     font-size: 40px;
-    min-height: 50px;
+    height: 50px;
 }
 
 .button {
