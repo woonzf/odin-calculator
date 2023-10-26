@@ -22,6 +22,10 @@ header, footer {
     color: white;
 }
 
+img {
+    height: 25px;
+}
+
 .content {
     display: flex;
     gap: 30px;
@@ -134,8 +138,4 @@ button:hover {
 a {
     text-decoration: none;
     color: white;
-}
-
-img {
-    height: 30px;
 }
